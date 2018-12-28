@@ -15,16 +15,9 @@ $ git clone https://github.com/M4GNV5/BluetoothLEDBadge
 ```
 usage: blebadge.py [-h] [--speed {1,2,3,4,5,6,7,8}]
                    [--mode {left,right,up,down,fixed,cycle,falldown,television,laser}]
-                   [--flash] [--marquee] --mac MAC
-                   text
+                   [--blink] [--marquee] --mac MAC [--text TEXT] [--file FILE]
 
 Set content of BLE LED Name Badge
-
-positional arguments:
-  text                  The text to send to the badge
-
-required arguments:
-  --mac MAC             The MAC address of the badge
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -32,6 +25,11 @@ optional arguments:
                         Set animation speed
   --mode {left,right,up,down,fixed,cycle,falldown,television,laser}
                         Set animation mode
-  --flash               Enable message flashing
+  --blink               Enable message blinking
   --marquee             Enable moving circle around text
+  --mac MAC             The MAC address of the badge
+  --text TEXT           The text to send to the badge
+  --file FILE           Input file to read texts from. Format is <speed
+                        1-8>,<mode>,<blink 0|1>,<marquee 0|1>,<text ...>. One
+                        message per line, up to 8 messages are supported
 ```
