@@ -29,13 +29,42 @@ parser.add_argument("--marquee", action="store_true",
 #	help="Enable sending a current timestamp to the badge.")
 parser.add_argument("--mac", required=True,
 	help="The MAC address of the badge")
-parser.add_argument("text",
+parser.add_argument("--text",
 	help="The text to send to the badge")
+parser.add_argument("--file", type=open,
+	help="Input file to read texts from. " +
+		"Format is <speed>,<mode>,<text ...>. " +
+		"One message per line, up to 8 messages are supported")
 
 args = parser.parse_args()
 
-# TODO support multiple messages (up to 8 are supported by the module)
-messages = [(args.speed, args.mode, args.text)]
+messages = []
+if args.text:
+	messages.append((args.speed, args.mode, args.text))
+elif args.file:
+	for line in args.file:
+		if line[-1] == "\n":
+			line = line[0:-1]
+
+		split = line.split(",")
+		speed = int(split[0])
+		mode = split[1]
+		text = ",".join(split[2:])
+
+		if speed < 1 or speed > 8:
+			print("Invalid speed " + split[0])
+			exit(1)
+		if mode not in modes:
+			print("Invalid mode " + mode)
+			exit(1)
+		if len(text) <= 0:
+			print("Invalid text size")
+			exit(1)
+
+		messages.append((speed, mode, text))
+else:
+	print("Either --text or --file must be given")
+	exit(1)
 
 # TODO support sending an actual timestamp
 timestamp = [0 for x in range(0, 16)]
