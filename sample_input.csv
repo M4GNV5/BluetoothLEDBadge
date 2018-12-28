@@ -1,5 +1,6 @@
-3,television,Foo Bar
-1,down,SLOW
-8,left,super speedy long text
-5,laser,Super LASER POWER
-6,falldown,fally blocks
+3,television,1,1,Foo Bar
+1,down,0,0,SLOW
+8,left,0,0,super speedy long text
+5,laser,0,1,Super LASER POWER
+6,falldown,0,0,fally blocks
+1,fixed,1,0,HI
