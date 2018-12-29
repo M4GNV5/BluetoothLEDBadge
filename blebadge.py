@@ -36,7 +36,9 @@ parser.add_argument("--file", type=open,
 		"Format is <speed 1-8>,<mode>,<blink 0|1>,<marquee 0|1>,<text ...>. " +
 		"One message per line, up to 8 messages are supported")
 parser.add_argument("--image",
-	help="Image file to display on the badge. (resolution needs to be 44x11)")
+	help="Image file to display on the badge. (height needs to be 11)")
+parser.add_argument("--video",
+	help="Video file to display on the badge. (height needs to be 11, width should be 44)")
 
 args = parser.parse_args()
 
@@ -46,6 +48,32 @@ def textToData(text):
 	data = []
 	for c in text:
 		data.extend(letters[c])
+
+	return data
+
+def imageToData(img):
+	h, w = img.shape
+	if h != 11:
+		print("Invalid image resolution: " + str(w) + "x" + str(h) + ". Needs to be 40x11")
+		exit(1)
+
+	byteW = w / 8
+	if w % 8 != 0:
+		byteW = byteW + 1
+
+	data = []
+	for row in range(0, byteW):
+		for y in range(0, 11):
+			byte = 0
+			for col in range(0, 8):
+				x = row * 8 + col
+				if x >= w:
+					continue
+
+				if img[y][x] > 128:
+					byte = byte | (1 << (7 - col))
+
+			data.append(byte)
 
 	return data
 
@@ -81,30 +109,24 @@ elif args.image:
 	import cv2
 
 	img = cv2.imread(args.image, 0)
-	h, w = img.shape
-	if h != 11:
-		print("Invalid image resolution: " + str(w) + "x" + str(h) + ". Needs to be 40x11")
-		exit(1)
-
-	byteW = w / 8
-	if w % 8 != 0:
-		byteW = byteW + 1
-
-	data = []
-	for row in range(0, byteW):
-		for y in range(0, 11):
-			byte = 0
-			for col in range(0, 8):
-				x = row * 8 + col
-				if x >= w:
-					continue
-
-				if img[y][x] != 255:
-					byte = byte | (1 << (7 - col))
-
-			data.append(byte)
+	data = imageToData(img)
 
 	messages.append((args.speed, args.mode, args.blink, args.marquee, data))
+elif args.video:
+	import cv2, numpy as np
+
+	vid = cv2.VideoCapture(args.video)
+	ret, long_img = vid.read()
+	while vid.isOpened():
+		ret, img = vid.read()
+		if not ret:
+			break
+		long_img = np.concatenate((long_img, img), axis=1)
+
+	long_img = cv2.cvtColor(long_img, cv2.COLOR_BGR2GRAY)
+	data = imageToData(long_img)
+	messages.append((args.speed, args.mode, args.blink, args.marquee, data))
+
 else:
 	print("Either --text or --file must be given")
 	exit(1)
@@ -127,7 +149,7 @@ for i in range(0, 8):
 		sizes.append(0)
 		sizes.append(0)
 		continue
-	
+
 	speed, mode, blink, marquee, data = messages[i]
 	options = ((speed - 1) << 4) | modes.index(mode)
 	textLen = len(data) / 11
