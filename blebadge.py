@@ -117,6 +117,10 @@ elif args.video:
 
 	vid = cv2.VideoCapture(args.video)
 	ret, long_img = vid.read()
+	if long_img.shape != (11, 44, 3):
+		print("Invalid video format, needs to be 44x11, but is ", long_img.shape)
+		exit(1)
+
 	while vid.isOpened():
 		ret, img = vid.read()
 		if not ret:
@@ -125,7 +129,7 @@ elif args.video:
 
 	long_img = cv2.cvtColor(long_img, cv2.COLOR_BGR2GRAY)
 	data = imageToData(long_img)
-	messages.append((args.speed, args.mode, args.blink, args.marquee, data))
+	messages.append((8, "fixed", False, False, data))
 
 else:
 	print("Either --text or --file must be given")
@@ -181,8 +185,8 @@ while len(values) > 0:
 	packages.append(part)
 	del values[0 : 16]
 
+print "Sending ", len(packages), " packages..."
 for part in packages:
-	print part
 	hex = ''.join(format(x, '02x') for x in part)
 	cmd = ["gatttool",
 		"--device=" + args.mac,
