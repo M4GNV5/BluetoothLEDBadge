@@ -54,7 +54,7 @@ def textToData(text):
 def imageToData(img):
 	h, w = img.shape
 	if h != 11:
-		print("Invalid image resolution: " + str(w) + "x" + str(h) + ". Needs to be 40x11")
+		print("Invalid image height: " + str(h) + ". Needs to be 11")
 		exit(1)
 
 	byteW = w / 8
@@ -117,8 +117,10 @@ elif args.video:
 
 	vid = cv2.VideoCapture(args.video)
 	ret, long_img = vid.read()
-	if long_img.shape != (11, 44, 3):
-		print("Invalid video format, needs to be 44x11, but is ", long_img.shape)
+
+	h, w, c = long_img.shape
+	if w != 44 or h != 11:
+		print("Invalid video format, needs to be 44x11, but is " + str(w) + "x" + str(h))
 		exit(1)
 
 	while vid.isOpened():
