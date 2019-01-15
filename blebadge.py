@@ -45,6 +45,7 @@ args = parser.parse_args()
 messages = []
 
 def textToData(text):
+	text = text.decode("utf-8")
 	data = []
 	for c in text:
 		data.extend(letters[c])
