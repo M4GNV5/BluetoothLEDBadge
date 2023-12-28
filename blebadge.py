@@ -10,7 +10,7 @@ with open("./letters.json", "r") as fd:
 	for letter in lettersHex:
 		representation = []
 		representationHex = lettersHex[letter]
-		for i in range(0, len(representationHex) / 2):
+		for i in range(0, len(representationHex) // 2):
 			hex = representationHex[i * 2 : i * 2 + 2]
 			representation.append(int(hex, 16))
 
@@ -188,7 +188,7 @@ while len(values) > 0:
 	packages.append(part)
 	del values[0 : 16]
 
-print "Sending ", len(packages), " packages..."
+print("Sending ", len(packages), " packages...")
 for part in packages:
 	hex = ''.join(format(x, '02x') for x in part)
 	cmd = ["gatttool",
